@@ -1,0 +1,14 @@
+title New Note SPA Sequence
+
+note over browser:
+browser 
+1) prevents default handling of form submit 
+2) executes the handler registered for form submit in spa.js, 
+and executes code to render a new note in the notes list 
+end note 
+
+browser->server: HTTP POST https://fullstack-exampleapp.herokuapp.com/new_note_spa, 
+content: {"content":"New note on SPA","date":"2020-01-15T12:53:02.782Z"}
+server-->browser: 200, content-type: application/json {message: "note created"}
+
+
