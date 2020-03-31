@@ -15,6 +15,15 @@ const MostVotes = ({ most, anecdotes, votes }) => {
   );
 };
 
+const Anecdote = ({ anecdote, votes }) => {
+  return (
+    <>
+      <p>{anecdote}</p>
+      <p>has {votes} votes</p>
+    </>
+  );
+};
+
 const App = ({ anecdotes }) => {
   /* App State Variables */
   // 'selected' is the index of the randomly selected anecdote
@@ -39,9 +48,8 @@ const App = ({ anecdotes }) => {
 
   return (
     <div>
-      <h1>Anecdotes</h1>
-      <p>{anecdotes[selected]}</p>
-      <p>has {votes[selected]} votes</p>
+      <h1>Random Anecdotes</h1>
+      <Anecdote anecdote={anecdotes[selected]} votes={votes[selected]} />
       <button onClick={randomAnecdote}>next</button>
       <button onClick={() => addVote()}>vote</button>
       <MostVotes
