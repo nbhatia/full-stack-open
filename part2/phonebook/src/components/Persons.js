@@ -1,8 +1,8 @@
 import React from "react";
+// import personDB from "../services/persondb";
 
-const Persons = ({ persons, filter }) => {
+const Persons = ({ persons, deletePerson, filter }) => {
   const rows = () => {
-    console.log("searching ", filter);
     const rowsToShow = filter.length
       ? persons.filter(
           person =>
@@ -11,11 +11,14 @@ const Persons = ({ persons, filter }) => {
       : persons;
 
     return rowsToShow
-      .map(p => (
-        <p key={p.name}>
-          {p.name} {p.phone}
-        </p>
-      ))
+      .map(p => {
+        return (
+          <div key={p.id}>
+            {p.name} {p.number}{" "}
+            <button onClick={() => deletePerson(p)}>delete</button>
+          </div>
+        );
+      })
       .reverse();
   };
 

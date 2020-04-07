@@ -1,42 +1,38 @@
 import React, { useState } from "react";
+// import PersonDB from "../services/persondb";
 
-const Form = ({ persons, setPersons }) => {
-  const blankPhoneNumber = "00-00-00000";
-  const [newName, setNewName] = useState("Enter Name");
-  const [newPhone, setNewPhone] = useState(blankPhoneNumber);
-
-  const handleNewName = event => {
-    setNewName(event.target.value);
+const Form = ({ addNewPerson }) => {
+  const BLANK_PHONE_NUMBER = "00-00-00000";
+  const formDataInit = {
+    name: "",
+    number: BLANK_PHONE_NUMBER
   };
 
-  const handleNewPhone = event => {
-    setNewPhone(event.target.value);
+  const [formData, setFormData] = useState(formDataInit);
+
+  const formNameChange = event => {
+    const newPerson = { ...formData, name: event.target.value };
+    setFormData(newPerson);
   };
 
-  const addPerson = event => {
-    event.preventDefault();
-    console.log(typeof persons);
-
-    if (persons.filter(person => person.name === newName).length > 0) {
-      window.alert(`${newName} is already added to phonebook`);
-      return;
-    }
-    setPersons(
-      persons.concat({
-        name: newName,
-        phone: newPhone
-      })
-    );
-    setNewName("");
-    setNewPhone(blankPhoneNumber);
+  const formPhoneChange = event => {
+    const newPerson = { ...formData, number: event.target.value };
+    setFormData(newPerson);
   };
 
   return (
-    <form onSubmit={addPerson}>
+    <form
+      onSubmit={event => {
+        event.preventDefault();
+        addNewPerson(formData);
+        setFormData(formDataInit);
+        console.log("cleared the form");
+      }}
+    >
       <div>
-        name: <input value={newName} onChange={handleNewName} />
+        name: <input value={formData.name} onChange={formNameChange} />
         <div>
-          phone: <input value={newPhone} onChange={handleNewPhone} />
+          phone: <input value={formData.number} onChange={formPhoneChange} />
         </div>
       </div>
       <div>
