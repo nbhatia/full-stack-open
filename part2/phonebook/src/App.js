@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 
+import Notification from "./components/Notification";
 import Filter from "./components/Filter";
 import Form from "./components/Form";
 import Persons from "./components/Persons";
@@ -7,6 +8,13 @@ import PersonDB from "./services/persondb";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
+
+  const BLANK_NOTIFICATION = {
+    msg: null,
+    type: null
+  };
+
+  const [notification, setNotification] = useState(BLANK_NOTIFICATION);
 
   useEffect(() => {
     PersonDB.getAll()
@@ -17,6 +25,12 @@ const App = () => {
   const [filter, setFilter] = useState("");
 
   const doFilter = event => setFilter(event.target.value);
+
+  const timeoutNotification = () => {
+    setTimeout(() => {
+      setNotification(BLANK_NOTIFICATION);
+    }, 3000);
+  };
 
   const addPerson = formData => {
     const existingPerson = persons.filter(
@@ -35,9 +49,25 @@ const App = () => {
         PersonDB.updatePerson(existingPerson[0].id, {
           ...existingPerson[0],
           number: formData.number
-        }).then(res => {
-          setPersons(persons.filter(p => p.id !== res.id).concat(res));
-        });
+        })
+          .then(res => {
+            setPersons(persons.filter(p => p.id !== res.id).concat(res));
+
+            setNotification({
+              msg: `${res.name} updated successfully`,
+              type: "success"
+            });
+            timeoutNotification();
+          })
+          .catch(err => {
+            console.log("error: ", err);
+            setNotification({
+              msg: `Information for ${existingPerson[0].name} has already been removed from server`,
+              type: "error"
+            });
+            setPersons(persons.filter(p => p.id !== existingPerson[0].id));
+            timeoutNotification();
+          });
       } else {
         console.log("Person add cancelled");
       }
@@ -45,21 +75,45 @@ const App = () => {
       // it's a new person..add it to the DB
       PersonDB.addPerson(formData).then(person => {
         setPersons(persons.concat(person));
+        setNotification({
+          msg: `${person.name} added successfully`,
+          type: "success"
+        });
+        timeoutNotification();
       });
+
       console.log("Person added..ok");
     }
   };
 
   const deletePerson = person => {
-    PersonDB.deletePerson(person.id).then(res => {
-      console.log(`${person.name} entry deleted...${res}`);
-      setPersons(persons.filter(p => p.id !== person.id));
-    });
+    PersonDB.deletePerson(person.id)
+      .then(res => {
+        console.log(`${person.name} entry deleted...${res}`);
+        setNotification({
+          msg: `Information for ${person.name} has been deleted`,
+          type: "success"
+        });
+        timeoutNotification();
+
+        // Refresh the Persons' list
+        setPersons(persons.filter(p => p.id !== person.id));
+      })
+      .catch(err => {
+        setNotification({
+          msg: `Informtion for ${person.name} has already been deleted from server`,
+          type: "error"
+        });
+        timeoutNotification();
+
+        setPersons(persons.filter(p => p.id !== person.id));
+      });
   };
 
   return (
     <div>
       <h2>My Phonebook</h2>
+      <Notification notification={notification} />
       <Filter doFilter={doFilter} />
 
       <h3>Add a new</h3>
