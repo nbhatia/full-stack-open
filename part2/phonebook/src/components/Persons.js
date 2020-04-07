@@ -15,7 +15,17 @@ const Persons = ({ persons, deletePerson, filter }) => {
         return (
           <div key={p.id}>
             {p.name} {p.number}{" "}
-            <button onClick={() => deletePerson(p)}>delete</button>
+            <button
+              onClick={() => {
+                if (
+                  window.confirm(`Are you sure you want to delete ${p.name}?`)
+                ) {
+                  deletePerson(p);
+                }
+              }}
+            >
+              delete
+            </button>
           </div>
         );
       })
